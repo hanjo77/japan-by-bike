@@ -87,16 +87,23 @@
             },
             translateTitle: function (title) {
                 const places = title.split(' to ');
-                switch(this.language) {
-                    case 'ja':
-                        return `${this.getTranslation(places[0])}から、${this.getTranslation(places[1])}まで。`;
-                    case 'en':
-                        return `From ${this.getTranslation(places[0])} to ${this.getTranslation(places[1])}`;
-                    case 'de':
-                        return `Von ${this.getTranslation(places[0])} nach ${this.getTranslation(places[1])}`;
-                    case 'de-ch':
-                        return `Vo ${this.getTranslation(places[0])} uf ${this.getTranslation(places[1])}`;
+                const trackPatterns = {
+                    'ja': '<<from>>から<<to>>まで。',
+                    'en': 'From <<from>> to <<to>>',
+                    'de': places[0].indexOf(' ko') > -1
+                        ? 'Vom <<from>> nach <<to>>'
+                        : places[1].indexOf(' ko') > -1
+                            ? 'Von <<from>> zum <<to>>'
+                            : 'Von <<from>> nach <<to>>',
+                    'de-ch': places[0].indexOf(' ko') > -1
+                        ? 'Vom <<from>> uf <<to>>'
+                        : places[1].indexOf(' ko') > -1
+                            ? 'Vo <<from>> zum <<to>>'
+                            : 'Vo <<from>> uf <<to>>'
                 }
+                return trackPatterns[this.language]
+                    .replace('<<from>>', this.getTranslation(places[0]))
+                    .replace('<<to>>', this.getTranslation(places[1]));
             },
             getTranslation: function(key) {
                 if (this.translations.filter(elem => elem.key === key)[0]) {
