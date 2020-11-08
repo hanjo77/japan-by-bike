@@ -41,7 +41,10 @@ for row in data_rows:
     if row_count > 0 and data_cols[1]:
         translations.append({
             "key": data_cols[0],
-            "ja": data_cols[1]
+            "ja": data_cols[1],
+            "en": data_cols[2],
+            "de": data_cols[3],
+            "de-ch": data_cols[4]
         })
 	row_count = row_count + 1
 

@@ -1,11 +1,15 @@
 <template>
+    <select class="form-control" @change="changeLanguage($event)">
+        <option value="" selected disabled>{{ getTranslation('language') }}</option>
+        <option v-for="language in languages" :value="language.key" :key="language.key">{{ language.name }}</option>
+    </select>
     <button class="detail-toggle-button" v-bind:title="toggleNavButtonHint" v-on:click="toggleNav()">{{ toggleNavButtonLabel }}</button>
     <div v-if="open">
         <fieldset class="toggle-overlay">
             <input type="checkbox" name="toggleOverlay" id="overlayVisible" v-model="overlayVisible" />
             <label for="overlayVisible">{{ getTranslation('show towns') }}</label>
         </fieldset>
-        <ol id="ridelist">
+        <ol id="ridelist" :class="`ridelist-${language}`">
             <li v-for="item in items" :key="item.filename">
                 <a
                     v-on:click="openMap(item.filename, true)"
@@ -31,7 +35,21 @@
                 toggleNavButtonHint: 'open details',
                 toggleNavButtonLabel: 'open details',
                 overlayVisible: false,
-                translations: []
+                translations: [],
+                language: 'en',
+                languages: [{
+                    key: 'ja',
+                    name: '日本語'
+                }, {
+                    key: 'en',
+                    name: 'English'
+                }, {
+                    key: 'de',
+                    name: 'Deutsch'
+                }, {
+                    key: 'de-ch',
+                    name: 'Schwiizerdütsch'
+                }]
             };
         },
         mounted() {
@@ -40,12 +58,11 @@
             }).then(data => {
                 this.translations = data.translations;
                 this.items = data.rides;
-                this.toggleNavButtonHint = this.toggleNavButtonLabel = this.getTranslation('open details');
                 this.toggleNavButtonHint = this.getTranslation(this.open ? 'close' : 'open details');
                 this.toggleNavButtonLabel = this.getTranslation(this.open ? 'X' : 'open details');
             })
         },
-        emits: ['open-kml', 'toggle-overlay'],
+        emits: ['open-kml', 'toggle-overlay', 'change-language'],
         watch: {
             overlayVisible: function(newVal) {
                 this.$emit('toggle-overlay', newVal);
@@ -70,11 +87,29 @@
             },
             translateTitle: function (title) {
                 const places = title.split(' to ');
-                return `${this.getTranslation(places[0])}から、${this.getTranslation(places[1])}まで。`;
+                switch(this.language) {
+                    case 'ja':
+                        return `${this.getTranslation(places[0])}から、${this.getTranslation(places[1])}まで。`;
+                    case 'en':
+                        return `From ${this.getTranslation(places[0])} to ${this.getTranslation(places[1])}`;
+                    case 'de':
+                        return `Von ${this.getTranslation(places[0])} nach ${this.getTranslation(places[1])}`;
+                    case 'de-ch':
+                        return `Vo ${this.getTranslation(places[0])} uf ${this.getTranslation(places[1])}`;
+                }
             },
             getTranslation: function(key) {
-                return this.translations.filter(elem => elem.key === key)[0]?.ja;
+                if (this.translations.filter(elem => elem.key === key)[0]) {
+                  return this.translations.filter(elem => elem.key === key)[0][this.language];
+                }
+                return 'UNDEFINED';
             },
+            changeLanguage (event) {
+                this.language = event.target.options[event.target.options.selectedIndex].value;
+                this.toggleNavButtonHint = this.getTranslation(this.open ? 'close' : 'open details');
+                this.toggleNavButtonLabel = this.getTranslation(this.open ? 'X' : 'open details');
+                this.$emit('change-language', this.language);
+            }
         }
     }
 </script>

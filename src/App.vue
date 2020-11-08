@@ -1,9 +1,9 @@
 <template>
   <div class="cell cell-map">
-    <MapContainer :kmlUrl="kmlUrl" :overlayVisible="overlayVisible" :doZoom="doZoom" :isMobile="isMobile()"></MapContainer>
+    <MapContainer :languageCode="languageCode" :kmlUrl="kmlUrl" :overlayVisible="overlayVisible" :doZoom="doZoom" :isMobile="isMobile()"></MapContainer>
   </div>
   <div class="cell cell-edit">
-    <RideList @open-kml="openKml($event)" @toggle-overlay="toggleOverlay($event)" :isMobile="isMobile()"></RideList>
+    <RideList @open-kml="openKml($event)" @toggle-overlay="toggleOverlay($event)" @change-language="changeLanguage($event)" :isMobile="isMobile()"></RideList>
   </div>
 </template>
 
@@ -17,13 +17,13 @@
       MapContainer,
       RideList
     },
-    emits: [ 'open-kml', 'reset-view', 'toggle-overlay' ],
     data() {
       return {
         kmlUrl: '/data/japan-by-bike.kml',
         overlayVisible: false,
         viewWidth: window.innerWidth,
-        doZoom: true
+        doZoom: true,
+        languageCode: 'en'
       }
     },
     methods: {
@@ -41,6 +41,9 @@
       },
       toggleOverlay(visible) {
         this.overlayVisible = visible;
+      },
+      changeLanguage(language) {
+        this.languageCode = language;
       }
     },
     mounted() {
@@ -61,8 +64,21 @@
 
   ol {
     margin: 1rem;
+  }
+
+  ol.ridelist-ja {
     margin-left: 2rem;
     list-style: cjk-ideographic;
+  }
+
+  select {
+    position: fixed;
+    left: 4rem;
+    top: 2rem;
+  }
+
+  option {
+    padding: 1rem;
   }
 
   #app {
