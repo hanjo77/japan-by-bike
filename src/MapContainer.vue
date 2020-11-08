@@ -79,30 +79,29 @@
       },
       updateMarkers: function() {
         this.map.getOverlays().clear();
-        if (this.overlayVisible) {
-          this.rideData.rides.forEach(ride => {
-            const fromTo = ride.title.split(' to ');
-            const coords = this.coords[ride.filename];
-            const completed = parseFloat(ride.completed);
+        this.rideData.rides.forEach(ride => {
+          const fromTo = ride.title.split(' to ');
+          const coords = this.coords[ride.filename];
+          const completed = parseFloat(ride.completed);
 
-            if (coords) {
-              const completedIndex = 0 < completed < 100
-                  ? Math.floor(completed * coords.length / 100)
-                  : coords.length;
-              if (fromTo[1]) {
-                this.markers[fromTo[0]] = this.map.addOverlay(this.getMarker(coords[0], this.getLocationLabel(fromTo[0], this.languageCode)));
-                this.markers[fromTo[1]] = this.map.addOverlay(this.getMarker(coords[coords.length - 1], this.getLocationLabel(fromTo[1], this.languageCode)));
-              }
-              if (completed < 100 && !this.markers['ハンヨ']) {
-                this.markers['ハンヨ'] = this.map.addOverlay(this.getMarker(
-                  completed === 0 ? coords[0] : coords[completedIndex],
-                  'ハンヨ',
-                  'current'
-                ));
-              }
+          if (coords) {
+            const completedIndex = 0 < completed < 100
+                ? Math.floor(completed * coords.length / 100)
+                : coords.length;
+            if (fromTo[1]) {
+              this.markers[fromTo[0]] = this.map.addOverlay(this.getMarker(coords[0], this.getLocationLabel(fromTo[0], this.languageCode)));
+              this.markers[fromTo[1]] = this.map.addOverlay(this.getMarker(coords[coords.length - 1], this.getLocationLabel(fromTo[1], this.languageCode)));
             }
-          });
-        }
+            if (completed < 100 && !this.markers['ハンヨ']) {
+              this.markers['ハンヨ'] = this.map.addOverlay(this.getMarker(
+                completed === 0 ? coords[0] : coords[completedIndex],
+                'ハンヨ',
+                'current'
+              ));
+            }
+          }
+        });
+        this.toggleOverlay(this.overlayVisible);
       },
       drawKmlData: function(ride, temp, setZoom) {
         if (ride) {

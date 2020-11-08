@@ -73,8 +73,16 @@
 
   select {
     position: fixed;
+    z-index: 1;
     left: 4rem;
     top: 2rem;
+  }
+
+  @media only screen and (max-width: 600px) {
+    select {
+      left: .5rem;
+      top: 5.5rem;
+    }
   }
 
   option {
@@ -102,17 +110,20 @@
   }
 
   .cell-edit {
-    position: absolute;
-    right: 1rem;
-    top: 1rem;
-    max-height: calc(100vh - 4rem);
+    position: fixed;
+    top: .5rem;
+    right: .5rem;
+    background: #ccc;
+    z-index: 2;
+    margin-left: .5rem;
+    max-height: calc(100vh - 1rem);
     overflow-y: scroll;
   }
 
   .detail-toggle-button {
     position: fixed;
-    right: 1rem;
-    top: 1rem;
+    right: .5rem;
+    top: .5rem;
     padding: .5rem;
     margin: .5rem;
   }

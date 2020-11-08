@@ -4,7 +4,7 @@
         <option v-for="language in languages" :value="language.key" :key="language.key">{{ language.name }}</option>
     </select>
     <button class="detail-toggle-button" v-bind:title="toggleNavButtonHint" v-on:click="toggleNav()">{{ toggleNavButtonLabel }}</button>
-    <div v-if="open">
+    <div class="overlay-container" v-if="open">
         <fieldset class="toggle-overlay">
             <input type="checkbox" name="toggleOverlay" id="overlayVisible" v-model="overlayVisible" />
             <label for="overlayVisible">{{ getTranslation('show towns') }}</label>
@@ -102,7 +102,7 @@
                 if (this.translations.filter(elem => elem.key === key)[0]) {
                   return this.translations.filter(elem => elem.key === key)[0][this.language];
                 }
-                return 'UNDEFINED';
+                return '...';
             },
             changeLanguage (event) {
                 this.language = event.target.options[event.target.options.selectedIndex].value;
