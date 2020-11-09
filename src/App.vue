@@ -64,18 +64,13 @@
 
   ol {
     margin: 1rem;
+    max-height: calc(100vh - 7rem);
+    overflow-y: scroll;
   }
 
   ol.ridelist-ja {
     margin-left: 2rem;
     list-style: cjk-ideographic;
-  }
-
-  select {
-    position: fixed;
-    z-index: 1;
-    left: 4rem;
-    top: 2rem;
   }
 
   @media only screen and (max-width: 600px) {
@@ -109,23 +104,64 @@
     position: fixed;
   }
 
-  .cell-edit {
+  .overlay {
     position: fixed;
-    top: .5rem;
-    right: .5rem;
     background: #ccc;
-    z-index: 2;
-    margin-left: .5rem;
-    max-height: calc(100vh - 1rem);
-    overflow-y: scroll;
+    z-index: 3;
+    border: 1px solid black;
+    box-shadow: 0 0 1rem black;
   }
 
-  .detail-toggle-button {
-    position: fixed;
-    right: .5rem;
+  .overlay-container {
     top: .5rem;
+    right: .5rem;
+    margin-left: .5rem;
+    max-height: calc(100vh - 1rem);
+  }
+
+  .lang-selection {
+    bottom: .5rem;
+    left: .5rem;
+    margin: 0;
+    padding: .5rem;
+    z-index: 0;
+  }
+
+  .lang-selection h2 {
+    font-size: 1.5rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  .lang-selection ul {
+    list-style-type: none;
+    margin-bottom: 0;
+  }
+
+  li a {
+    display: block;
+  }
+
+  li a:hover {
+    background: #999;
+  }
+
+  .toggle-button {
+    position: fixed;
     padding: .5rem;
     margin: .5rem;
+  }
+
+  .lang-button {
+    left: .5rem;
+    bottom: .5rem;
+    z-index: 2;
+  }
+
+  .detail-button {
+    right: .5rem;
+    top: .5rem;
+    z-index: 4;
   }
 
   .map-overlay {
@@ -136,8 +172,11 @@
     max-height: 2rem;
   }
 
+  .marker-icon .title {
+    text-shadow: 1px 1px white, -1px -1px white, 0 0 0.2em white;
+  }
+
   .toggle-overlay {
-    text-align: center;
     border: 0;
   }
 

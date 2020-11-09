@@ -1,10 +1,17 @@
 <template>
-    <select class="form-control" @change="changeLanguage($event)">
-        <option value="" selected disabled>{{ getTranslation('language') }}</option>
-        <option v-for="language in languages" :value="language.key" :key="language.key">{{ language.name }}</option>
-    </select>
-    <button class="detail-toggle-button" v-bind:title="toggleNavButtonHint" v-on:click="toggleNav()">{{ toggleNavButtonLabel }}</button>
-    <div class="overlay-container" v-if="open">
+    <div class="lang-container">
+        <button class="toggle-button lang-button" v-bind:title="toggleLangButtonHint" v-on:click="toggleLangSelect()">{{ toggleLangButtonLabel }}</button>
+        <div class="overlay lang-selection" v-if="langOpen">
+            <h2>{{ getTranslation('choose language') }}</h2>
+            <ul>
+                <li v-for="language in languages" :value="language.key" :key="language.key">
+                    <a v-on:click="changeLanguage(language.key)">{{ language.name }}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <button class="toggle-button detail-button" v-bind:title="toggleNavButtonHint" v-on:click="toggleNav()">{{ toggleNavButtonLabel }}</button>
+    <div class="overlay overlay-container" v-if="navOpen">
         <fieldset class="toggle-overlay">
             <input type="checkbox" name="toggleOverlay" id="overlayVisible" v-model="overlayVisible" />
             <label for="overlayVisible">{{ getTranslation('show towns') }}</label>
@@ -30,10 +37,13 @@
         },
         data() {
             return {
-                open: false,
+                navOpen: false,
+                langOpen: false,
                 items: [],
                 toggleNavButtonHint: 'open details',
                 toggleNavButtonLabel: 'open details',
+                toggleLangButtonHint: 'choose language',
+                toggleLangButtonLabel: 'language',
                 overlayVisible: false,
                 translations: [],
                 language: 'en',
@@ -48,7 +58,7 @@
                     name: 'Deutsch'
                 }, {
                     key: 'de-ch',
-                    name: 'Schwiizerdütsch'
+                    name: 'Bärndütsch'
                 }]
             };
         },
@@ -58,8 +68,10 @@
             }).then(data => {
                 this.translations = data.translations;
                 this.items = data.rides;
-                this.toggleNavButtonHint = this.getTranslation(this.open ? 'close' : 'open details');
-                this.toggleNavButtonLabel = this.getTranslation(this.open ? 'X' : 'open details');
+                this.toggleNavButtonHint = this.getTranslation(this.navOpen ? 'close' : 'open details');
+                this.toggleNavButtonLabel = this.getTranslation(this.navOpen ? 'X' : 'open details');
+                this.toggleLangButtonHint = this.getTranslation(this.langOpen ? 'close' : 'choose language');
+                this.toggleLangButtonLabel = this.getTranslation(this.langOpen ? 'X' : 'language');
             })
         },
         emits: ['open-kml', 'toggle-overlay', 'change-language'],
@@ -78,17 +90,22 @@
                 this.$emit('open-kml', { filename: filename, doZoom: doZoom });
             },
             toggleNav: function () {
-                this.open = !this.open;
-                this.toggleNavButtonHint = this.getTranslation(this.open ? 'close' : 'open details');
-                this.toggleNavButtonLabel = this.getTranslation(this.open ? 'X' : 'open details');
-                if (!this.open) {
+                this.navOpen = !this.navOpen;
+                this.toggleNavButtonHint = this.getTranslation(this.navOpen ? 'close' : 'open details');
+                this.toggleNavButtonLabel = this.getTranslation(this.navOpen ? 'X' : 'open details');
+                if (!this.navOpen) {
                     this.$emit('open-kml', null);
                 }
+            },
+            toggleLangSelect: function () {
+                this.langOpen = !this.langOpen;
+                this.toggleLangButtonHint = this.getTranslation(this.langOpen ? 'close' : 'choose language');
+                this.toggleLangButtonLabel = this.getTranslation(this.langOpen ? 'X' : 'language');
             },
             translateTitle: function (title) {
                 const places = title.split(' to ');
                 const trackPatterns = {
-                    'ja': '<<from>>から<<to>>まで。',
+                    'ja': '<<from>>から、<<to>>まで。',
                     'en': 'From <<from>> to <<to>>',
                     'de': places[0].indexOf(' ko') > -1
                         ? 'Vom <<from>> nach <<to>>'
@@ -111,10 +128,13 @@
                 }
                 return '...';
             },
-            changeLanguage (event) {
-                this.language = event.target.options[event.target.options.selectedIndex].value;
-                this.toggleNavButtonHint = this.getTranslation(this.open ? 'close' : 'open details');
-                this.toggleNavButtonLabel = this.getTranslation(this.open ? 'X' : 'open details');
+            changeLanguage (language) {
+                this.langOpen = false;
+                this.language = language;
+                this.toggleLangButtonHint = this.getTranslation(this.langOpen ? 'close' : 'choose language');
+                this.toggleLangButtonLabel = this.getTranslation(this.langOpen ? 'X' : 'language');
+                this.toggleNavButtonHint = this.getTranslation(this.navOpen ? 'close' : 'open details');
+                this.toggleNavButtonLabel = this.getTranslation(this.navOpen ? 'X' : 'open details');
                 this.$emit('change-language', this.language);
             }
         }
