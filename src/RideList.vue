@@ -1,6 +1,6 @@
 <template>
     <div class="lang-container">
-        <button class="toggle-button lang-button" v-bind:title="toggleLangButtonHint" v-on:click="toggleLangSelect()">{{ toggleLangButtonLabel }}</button>
+        <a class="toggle-button lang-button" v-bind:title="toggleLangButtonHint" v-on:click="toggleLangSelect()">{{ toggleLangButtonLabel }}</a>
         <div class="overlay lang-selection" v-if="langOpen">
             <h2>{{ getTranslation('choose language') }}</h2>
             <ul>
@@ -10,14 +10,14 @@
             </ul>
         </div>
     </div>
-    <button class="toggle-button detail-button" v-bind:title="toggleNavButtonHint" v-on:click="toggleNav()">{{ toggleNavButtonLabel }}</button>
-    <div class="overlay overlay-container" v-if="navOpen">
+    <a class="toggle-button detail-button" v-bind:title="toggleContentButtonHint" v-on:click="toggleContent()">{{ toggleContentButtonLabel }}</a>
+    <div class="overlay overlay-container" v-if="contentOpen">
         <fieldset class="toggle-overlay">
             <input type="checkbox" name="toggleOverlay" id="overlayVisible" v-model="overlayVisible" />
             <label for="overlayVisible">{{ getTranslation('show towns') }}</label>
         </fieldset>
         <ol id="ridelist" :class="`ridelist-${language}`">
-            <li v-for="item in items" :key="item.filename">
+            <li v-for="item in items" :key="item.filename" :class="completedClass(item)">
                 <a
                     v-on:click="openMap(item.filename, true)"
                     v-on:mousemove="openMap(item.filename, false)"
@@ -37,11 +37,11 @@
         },
         data() {
             return {
-                navOpen: false,
+                contentOpen: false,
                 langOpen: false,
                 items: [],
-                toggleNavButtonHint: 'open details',
-                toggleNavButtonLabel: 'open details',
+                toggleContentButtonHint: 'open details',
+                toggleContentButtonLabel: 'open details',
                 toggleLangButtonHint: 'choose language',
                 toggleLangButtonLabel: 'language',
                 overlayVisible: false,
@@ -68,8 +68,8 @@
             }).then(data => {
                 this.translations = data.translations;
                 this.items = data.rides;
-                this.toggleNavButtonHint = this.getTranslation(this.navOpen ? 'close' : 'open details');
-                this.toggleNavButtonLabel = this.getTranslation(this.navOpen ? 'X' : 'open details');
+                this.toggleContentButtonHint = this.getTranslation(this.contentOpen ? 'close' : 'open details');
+                this.toggleContentButtonLabel = this.getTranslation(this.contentOpen ? 'X' : 'open details');
                 this.toggleLangButtonHint = this.getTranslation(this.langOpen ? 'close' : 'choose language');
                 this.toggleLangButtonLabel = this.getTranslation(this.langOpen ? 'X' : 'language');
             })
@@ -84,16 +84,16 @@
             openMap: function (filename, doZoom) {
                 if (this.isMobile) {
                     doZoom = true;
-                    this.open = false;
-                    this.toggleNavButtonHint = this.toggleNavButtonLabel = this.getTranslation('open details');
+                    this.contentOpen = false;
+                    this.toggleContentButtonHint = this.toggleContentButtonLabel = this.getTranslation('open details');
                 }
                 this.$emit('open-kml', { filename: filename, doZoom: doZoom });
             },
-            toggleNav: function () {
-                this.navOpen = !this.navOpen;
-                this.toggleNavButtonHint = this.getTranslation(this.navOpen ? 'close' : 'open details');
-                this.toggleNavButtonLabel = this.getTranslation(this.navOpen ? 'X' : 'open details');
-                if (!this.navOpen) {
+            toggleContent: function () {
+                this.contentOpen = !this.contentOpen;
+                this.toggleContentButtonHint = this.getTranslation(this.contentOpen ? 'close' : 'open details');
+                this.toggleContentButtonLabel = this.getTranslation(this.contentOpen ? 'X' : 'open details');
+                if (!this.contentOpen) {
                     this.$emit('open-kml', null);
                 }
             },
@@ -128,13 +128,21 @@
                 }
                 return '...';
             },
+            completedClass (ride) {
+                const completed = parseFloat(ride.completed);
+                return completed >= 100
+                    ? 'ride-done'
+                    : completed > 0
+                        ? 'ride-in-progress'
+                        : 'ride-open';
+            },
             changeLanguage (language) {
                 this.langOpen = false;
                 this.language = language;
                 this.toggleLangButtonHint = this.getTranslation(this.langOpen ? 'close' : 'choose language');
                 this.toggleLangButtonLabel = this.getTranslation(this.langOpen ? 'X' : 'language');
-                this.toggleNavButtonHint = this.getTranslation(this.navOpen ? 'close' : 'open details');
-                this.toggleNavButtonLabel = this.getTranslation(this.navOpen ? 'X' : 'open details');
+                this.toggleContentButtonHint = this.getTranslation(this.contentOpen ? 'close' : 'open details');
+                this.toggleContentButtonLabel = this.getTranslation(this.contentOpen ? 'X' : 'open details');
                 this.$emit('change-language', this.language);
             }
         }

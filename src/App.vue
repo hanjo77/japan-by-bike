@@ -143,13 +143,35 @@
   }
 
   li a:hover {
-    background: #999;
+    text-shadow: 0 0 .2rem #999;
+  }
+
+  li.ride-done a:hover {
+    text-shadow: 0 0 .2rem #9f9;
+  }
+
+  li.ride-in-progress a:hover {
+    text-shadow: 0 0 .2rem #ff9;
+  }
+
+  li.ride-open a:hover {
+    text-shadow: 0 0 .2rem #f99;
   }
 
   .toggle-button {
     position: fixed;
     padding: .5rem;
     margin: .5rem;
+    display: block;
+    color: black;
+    background: #ccc;
+    border: 1px solid black;
+    padding: .2rem .5rem;
+  }
+
+  .toggle-button:hover {
+    color: #ccc;
+    background: black;
   }
 
   .lang-button {
