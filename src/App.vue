@@ -64,8 +64,6 @@
 
   ol {
     margin: 1rem;
-    max-height: calc(100vh - 7rem);
-    overflow-y: scroll;
   }
 
   ol.ridelist-ja {
@@ -117,6 +115,21 @@
     right: .5rem;
     margin-left: .5rem;
     max-height: calc(100vh - 1rem);
+  }
+
+  .overlay-container p {
+    margin: 2rem;
+  }
+
+  @media only screen and (min-width: 800px) {
+    .overlay-container p {
+      max-width: 50vw;
+    }
+  }
+
+  .overlay-content {
+    max-height: calc(100vh - 5rem);
+    overflow-y: scroll;
   }
 
   .lang-selection {

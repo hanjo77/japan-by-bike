@@ -16,14 +16,18 @@
             <input type="checkbox" name="toggleOverlay" id="overlayVisible" v-model="overlayVisible" />
             <label for="overlayVisible">{{ getTranslation('show towns') }}</label>
         </fieldset>
-        <ol id="ridelist" :class="`ridelist-${language}`">
-            <li v-for="item in items" :key="item.filename" :class="completedClass(item)">
-                <a
-                    v-on:click="openMap(item.filename, true)"
-                    v-on:mousemove="openMap(item.filename, false)"
-                    v-on:mouseout="openMap(null, false)">{{ translateTitle(item.title) }}</a>
-            </li>
-        </ol>
+        <div class="overlay-content">
+            <p>{{ texts.intro[language] }}</p>
+            <p>{{ texts.followup[language]  }}</p>
+            <ol id="ridelist" :class="`ridelist-${language}`">
+                <li v-for="item in items" :key="item.filename" :class="completedClass(item)">
+                    <a
+                        v-on:click="openMap(item.filename, true)"
+                        v-on:mousemove="openMap(item.filename, false)"
+                        v-on:mouseout="openMap(null, false)">{{ translateTitle(item.title) }}</a>
+                </li>
+            </ol>
+        </div>
     </div>
 </template>
 
@@ -59,7 +63,22 @@
                 }, {
                     key: 'de-ch',
                     name: 'Bärndütsch'
-                }]
+                }],
+                texts: {
+                    intro: {
+                        'ja': '2020、私はエアロバイク、Oculus Go、VZFit Explorerを購入して、Covidのためにブロックされた今年の意図された日本旅行を事実上実行しました。',
+                        'en': '2020 I have bought a stationary bike, an Oculus Go and VZFit Explorer to virtually go on the intended Japan trip of this year that was blocked due to Covid.',
+                        'de': '2020 habe ich ein stationäres Fahrrad, ein Oculus Go und einen VZFit Explorer gekauft, um die geplante aber aufgrund von Covid blockierte Reise nach Japan virtuell durchzuführen.',
+                        'de-ch': '2020 hani mer es stationärs Velo, es Oculus Go u VZFit Explorer poschtet, für die planti aber wäge Covid verschobeni Reis nach Japan virtueu dürezfüehre.'
+                    },
+                    followup: {
+                        'ja': 'この地図は、ルートと私の現在の進捗状況を示しています。',
+                        'en': 'This map shows the route and my current progress.',
+                        'de': 'Diese Karte zeigt die Route und meinen aktuellen Fortschritt.',
+                        'de-ch': 'Uf dere Charte gseht me d\'Route u woni grad stecke.'
+
+                    }
+                }
             };
         },
         mounted() {
