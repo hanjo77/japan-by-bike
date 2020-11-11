@@ -155,19 +155,19 @@
     display: block;
   }
 
-  li a:hover {
+  li:hover {
     text-shadow: 0 0 .2rem #999;
   }
 
-  li.ride-done a:hover {
+  li.ride-done:hover {
     text-shadow: 0 0 .2rem #9f9;
   }
 
-  li.ride-in-progress a:hover {
+  li.ride-in-progress:hover {
     text-shadow: 0 0 .2rem #ff9;
   }
 
-  li.ride-open a:hover {
+  li.ride-open:hover {
     text-shadow: 0 0 .2rem #f99;
   }
 
