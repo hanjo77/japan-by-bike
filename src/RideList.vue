@@ -4,8 +4,8 @@
         <div class="overlay lang-selection" v-if="langOpen">
             <h2>{{ getTranslation('choose language') }}</h2>
             <ul>
-                <li v-for="language in languages" :value="language.key" :key="language.key">
-                    <a v-on:click="changeLanguage(language.key)">{{ language.name }}</a>
+                <li v-for="lang in languages" :value="lang.key" :key="lang.key" :class="lang.key === language ? 'selected' : null">
+                    <a v-on:click="changeLanguage(lang.key)">{{ lang.name }}</a>
                 </li>
             </ul>
         </div>

@@ -118,7 +118,7 @@
   }
 
   .overlay-container p {
-    margin: 2rem;
+    margin: 1rem 2rem;
   }
 
   @media only screen and (min-width: 800px) {
@@ -156,6 +156,11 @@
   }
 
   li:hover {
+    text-shadow: 0 0 .2rem #999;
+  }
+
+  li.selected {
+    font-weight: bold;
     text-shadow: 0 0 .2rem #999;
   }
 
