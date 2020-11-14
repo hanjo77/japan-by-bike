@@ -1,9 +1,9 @@
 <template>
   <div class="cell cell-map">
-    <MapContainer :languageCode="languageCode" :kmlUrl="kmlUrl" :overlayVisible="overlayVisible" :doZoom="doZoom" :isMobile="isMobile()"></MapContainer>
+    <MapContainer :languageCode="languageCode" :kmlUrl="kmlUrl" :overlayVisible="overlayVisible" :doZoom="doZoom" :isMobile="isMobile()" :location="location"></MapContainer>
   </div>
   <div class="cell cell-edit">
-    <RideList @open-kml="openKml($event)" @toggle-overlay="toggleOverlay($event)" @change-language="changeLanguage($event)" :isMobile="isMobile()"></RideList>
+    <RideList @open-kml="openKml($event)" @open-location="openLocation($event)" @toggle-overlay="toggleOverlay($event)" @change-language="changeLanguage($event)" :isMobile="isMobile()"></RideList>
   </div>
 </template>
 
@@ -23,7 +23,8 @@
         overlayVisible: false,
         viewWidth: window.innerWidth,
         doZoom: true,
-        languageCode: 'en'
+        location: undefined,
+        languageCode: this.getDefaultLanguage()
       }
     },
     methods: {
@@ -34,16 +35,31 @@
                 this.viewWidth = window.innerWidth;
       },
       openKml(event) {
+        this.location = undefined;
         if (event?.doZoom !== undefined) {
           this.doZoom = event.doZoom;
         }
-        this.kmlUrl = `/data/${event?.filename}`;
+        this.kmlUrl = event?.filename ? `/data/${event.filename}` : undefined;
+      },
+      openLocation(event) {
+        this.kmlUrl = 'void';
+        this.location = event.location;
       },
       toggleOverlay(visible) {
         this.overlayVisible = visible;
       },
       changeLanguage(language) {
         this.languageCode = language;
+      },
+      getDefaultLanguage() {
+          let lang = window.navigator.language.toLowerCase();
+          const langs = ['ja', 'en', 'de', 'de-ch'];
+          if (langs.indexOf(lang) > -1) {
+              return lang;
+          } else if (langs.indexOf(lang.split('-')[0]) > -1) {
+              return lang.split('-')[0];
+          }
+          return 'en';
       }
     },
     mounted() {
@@ -126,6 +142,8 @@
     text-align: left;
     font-weight: normal;
     text-shadow: 0 0 .2rem #999;
+    white-space: nowrap;
+    vertical-align: top;
   }
 
   .overlay-content {
@@ -167,8 +185,13 @@
   }
 
 
-  li:hover {
+  li:hover,
+  a:hover {
     text-shadow: 0 0 .2rem #999;
+  }
+
+  li a:hover {
+    text-shadow: inherit;
   }
 
   li.selected {
@@ -230,6 +253,11 @@
 
   .toggle-overlay {
     border: 0;
+  }
+
+  .toggle-overlay a {
+    margin-left: 1rem;
+    white-space: nowrap;
   }
 
   #overlayVisible {

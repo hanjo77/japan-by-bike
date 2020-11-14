@@ -30,7 +30,8 @@
       kmlUrl: String,
       overlayVisible: Boolean,
       doZoom: Boolean,
-      languageCode: String
+      languageCode: String,
+      location: Array
     },
     methods: {
       toggleOverlay: function(value) {
@@ -201,14 +202,19 @@
       }
     },
     watch: {
+      location: function(newVal) {
+        if (newVal) {
+          this.map.getView().setZoom(13);
+          this.map.getView().setCenter(projTransform([newVal[0], newVal[1]], 'EPSG:4326', 'EPSG:3857'));
+        }
+      },
       overlayVisible: function(newVal) {
         this.toggleOverlay(newVal);
       },
       kmlUrl: function(newVal) {
         this.kmlLayers.forEach(layer => this.map.removeLayer(layer));
-        if (!newVal) {
-          this.centerView();
-        } else {
+        this.centerView();
+        if (newVal && newVal !== 'void') {
           this.drawKmlData(this.rideData.rides.filter(elem => newVal.indexOf(elem.filename) > -1)[0], true, this.doZoom);
         }
       },

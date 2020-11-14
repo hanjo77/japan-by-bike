@@ -15,11 +15,22 @@
         <fieldset class="toggle-overlay">
             <input type="checkbox" name="toggleOverlay" id="overlayVisible" v-model="overlayVisible" />
             <label for="overlayVisible">{{ getTranslation('show towns') }}</label>
+            <a v-on:click="resetMap()">
+                {{ getTranslation('reset map') }}
+            </a>
         </fieldset>
         <div class="overlay-content">
             <p>{{ texts.intro[language] }}</p>
             <p>{{ texts.followup[language]  }}</p>
             <table>
+                <tr>
+                    <th>{{ getTranslation('current location') }}</th>
+                    <td>
+                        <a v-on:click="openCurrentMarker()">
+                            {{ locationName }}
+                        </a>
+                    </td>
+                </tr>
                 <tr>
                     <th>{{ getTranslation('total distance') }}</th>
                     <td>{{ totalDistance + texts.km[language]}}</td>
@@ -33,8 +44,9 @@
                 <li v-for="item in items" :key="item.filename" :class="completedClass(item)">
                     <a
                         v-on:click="openMap(item.filename, true)"
-                        v-on:mousemove="openMap(item.filename, false)"
-                        v-on:mouseout="openMap(null, false)">{{ translateTitle(item.title) }}
+                        v-on:mouseenter="openMap(item.filename, false)"
+                    >
+                        {{ translateTitle(item.title) }}
                     </a>{{ texts.km_bracket[language].replace('VALUE', item.distance) }}
                 </li>
             </ol>
@@ -63,7 +75,9 @@
                 toggleLangButtonLabel: 'language',
                 overlayVisible: false,
                 translations: [],
-                language: 'en',
+                language: this.getDefaultLanguage(),
+                locationName: '',
+                currentCoords: [],
                 languages: [{
                     key: 'ja',
                     name: '日本語'
@@ -117,6 +131,7 @@
             }).then(data => {
                 this.translations = data.translations;
                 this.items = data.rides;
+                this.getCurrentCoords();
                 this.totalDistance = this.getTotalDistance();
                 this.doneDistance = this.getDoneDistance();
                 this.toggleContentButtonHint = this.getTranslation(this.contentOpen ? 'close' : 'open details');
@@ -125,20 +140,43 @@
                 this.toggleLangButtonLabel = this.getTranslation(this.langOpen ? 'X' : 'language');
             })
         },
-        emits: ['open-kml', 'toggle-overlay', 'change-language'],
+        emits: ['open-kml', 'open-location', 'toggle-overlay', 'change-language'],
         watch: {
             overlayVisible: function(newVal) {
                 this.$emit('toggle-overlay', newVal);
             }
         },
         methods: {
+            getDefaultLanguage() {
+                let lang = window.navigator.language.toLowerCase();
+                const langs = ['ja', 'en', 'de', 'de-ch'];
+                if (langs.indexOf(lang) > -1) {
+                    return lang;
+                } else if (langs.indexOf(lang.split('-')[0]) > -1) {
+                    return lang.split('-')[0];
+                }
+                return 'en';
+            },
+            resetMap: function () {
+                this.$emit('open-kml', null);
+            },
             openMap: function (filename, doZoom) {
+                if (!doZoom) {
+                    this.resetMap();
+                }
                 if (this.isMobile) {
                     doZoom = true;
                     this.contentOpen = false;
                     this.toggleContentButtonHint = this.toggleContentButtonLabel = this.getTranslation('open details');
                 }
                 this.$emit('open-kml', { filename: filename, doZoom: doZoom });
+            },
+            openCurrentMarker: function () {
+                if (this.isMobile) {
+                    this.contentOpen = false;
+                    this.toggleContentButtonHint = this.toggleContentButtonLabel = this.getTranslation('open details');
+                }
+                this.$emit('open-location', { location: this.currentCoords });
             },
             toggleContent: function () {
                 this.contentOpen = !this.contentOpen;
@@ -192,6 +230,47 @@
             getPercentDone () {
                 return Math.round((this.doneDistance * 100) / this.totalDistance);
             },
+            getCurrentCoords () {
+                this.items.forEach(item => {
+                    const completed = parseInt(item.completed, 10);
+                    if (0 < completed < 100) {
+                        fetch('data/' + item.filename)
+                            .then(response => response.text())
+                            .then(kmlData => {
+                                const coordData = new DOMParser()
+                                    .parseFromString(kmlData, "text/xml")
+                                    .querySelector('coordinates')?.innerHTML
+                                    .split(new RegExp('[,\\s]', 'g'))
+                                    .filter(elem => !!elem)
+                                    .map(elem => parseFloat(elem));
+
+                                const coords = [];
+
+                                for (let i = 0; i < coordData?.length; i += 3) {
+                                    coords.push([coordData[i], coordData[i + 1]]);
+                                }
+
+                                const completedIndex = Math.floor(completed * coords.length / 100);
+                                
+                                if (coords[completedIndex]) {
+                                    this.currentCoords = coords[completedIndex];
+                                    this.getLocationName();
+                                }
+                            });
+                    }
+                });
+            },
+            getLocationName () {
+                fetch('https://nominatim.openstreetmap.org/reverse?format=json'
+                    + '&accept-language=' + this.language.split('-')[0]
+                    + '&lon=' + this.currentCoords[0]
+                    + '&lat=' + this.currentCoords[1]
+                )
+                    .then((response) => response.json())
+                    .then(function(json) {
+                        this.locationName = json.display_name;
+                    }.bind(this));
+            },
             completedClass (ride) {
                 const completed = parseFloat(ride.completed);
                 return completed >= 100
@@ -203,6 +282,7 @@
             changeLanguage (language) {
                 this.langOpen = false;
                 this.language = language;
+                this.getLocationName();
                 this.toggleLangButtonHint = this.getTranslation(this.langOpen ? 'close' : 'choose language');
                 this.toggleLangButtonLabel = this.getTranslation(this.langOpen ? 'X' : 'language');
                 this.toggleContentButtonHint = this.getTranslation(this.contentOpen ? 'close' : 'open details');
