@@ -174,19 +174,26 @@
     }
   }
 
+  a {
+    text-shadow: 0 0 .2rem #999;
+    text-decoration: none;
+    color: inherit;
+  }
+
 
   li:hover,
   a:hover {
-    text-shadow: 0 0 .2rem #999;
+    text-shadow: 0 0 .2rem #666;
   }
 
-  li a:hover {
+  li a:hover,
+  li:hover a {
     text-shadow: inherit;
   }
 
   li.selected {
     font-weight: bold;
-    text-shadow: 0 0 .2rem #999;
+    text-shadow: 0 0 .2rem #666;
   }
 
   li.ride-done:hover {

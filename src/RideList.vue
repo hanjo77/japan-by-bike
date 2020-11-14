@@ -20,8 +20,8 @@
             </a>
         </fieldset>
         <div class="overlay-content">
-            <p>{{ texts.intro[language] }}</p>
-            <p>{{ texts.followup[language]  }}</p>
+            <p v-html="addLinks(texts.intro[language])"></p>
+            <p v-html="addLinks(texts.followup[language])"></p>
             <table>
                 <tr>
                     <th>{{ getTranslation('current location') }}</th>
@@ -93,10 +93,10 @@
                 }],
                 texts: {
                     intro: {
-                        'ja': '2020、私はエアロバイク、Oculus Go、VZFit Explorerを購入して、Covidのためにブロックされた今年の意図された日本旅行を事実上実行しました。',
-                        'en': '2020 I have bought a stationary bike, an Oculus Go and VZFit Explorer to virtually go on my intended trip to Japan that was blocked by Covid.',
-                        'de': '2020 habe ich ein stationäres Fahrrad, ein Oculus Go und einen VZFit Explorer gekauft, um die geplante aber aufgrund von Covid blockierte Reise nach Japan virtuell durchzuführen.',
-                        'de-ch': '2020 hani mer es stationärs Velo, es Oculus Go u VZFit Explorer poschtet, für die planti aber wäge Covid verschobeni Reis nach Japan virtueu dürezfüehre.'
+                        'ja': '2020、私はエアロバイク、Oculus Quest、VZFit Explorerを購入して、COVIDのためにブロックされた今年の意図された日本旅行を事実上実行しました。',
+                        'en': 'In 2020, I have bought a stationary bike, an Oculus Quest and VZFit Explorer to virtually go on my intended trip to Japan that was blocked by COVID.',
+                        'de': '2020 habe ich ein stationäres Fahrrad, ein Oculus Quest und einen VZFit Explorer gekauft, um die geplante aber aufgrund von COVID blockierte Reise nach Japan virtuell durchzuführen.',
+                        'de-ch': 'Im 2020 hani mer es stationärs Velo, es Oculus Quest u VZFit Explorer poschtet, für die planti aber wäge COVID verschobeni Reis nach Japan virtueu dürezfüehre.'
                     },
                     followup: {
                         'ja': 'この地図は、ルートと私の現在の進捗状況を示しています。',
@@ -122,6 +122,10 @@
                         'de': ' (VALUE %)',
                         'de-ch': ' (VALUE %)'
                     }
+                },
+                links: {
+                    'Oculus Quest': 'https://www.oculus.com/quest/',
+                    'VZFit Explorer': 'https://www.virzoom.com/'
                 }
             };
         },
@@ -148,7 +152,14 @@
             }
         },
         methods: {
-            getDefaultLanguage() {
+            addLinks: function (text) {
+                Object.keys(this.links).forEach(key => text = text.replace(
+                    key,
+                    `<a href="${this.links[key]}" target="_blank">${key}</a>`
+                ));
+                return text;
+            },
+            getDefaultLanguage: function () {
                 let lang = window.navigator.language.toLowerCase();
                 const langs = ['ja', 'en', 'de', 'de-ch'];
                 if (langs.indexOf(lang) > -1) {
