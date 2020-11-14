@@ -62,7 +62,7 @@
     padding: 0;
   }
 
-  ol {
+  .cell-edit ol {
     margin: 1rem;
   }
 
@@ -117,14 +117,15 @@
     max-height: calc(100vh - 1rem);
   }
 
-  .overlay-container p {
+  .overlay-container p,
+  .overlay-container table {
     margin: 1rem 2rem;
   }
 
-  @media only screen and (min-width: 800px) {
-    .overlay-container p {
-      max-width: 50vw;
-    }
+  .overlay-container th {
+    text-align: left;
+    font-weight: normal;
+    text-shadow: 0 0 .2rem #999;
   }
 
   .overlay-content {
@@ -152,8 +153,19 @@
   }
 
   li a {
-    display: block;
+    display: inline-block;
   }
+
+  @media only screen and (min-width: 800px) {
+    .overlay-container {
+      max-width: min-content;
+    }
+
+    .overlay-container li {
+      white-space: nowrap;
+    }
+  }
+
 
   li:hover {
     text-shadow: 0 0 .2rem #999;

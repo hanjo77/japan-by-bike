@@ -19,12 +19,23 @@
         <div class="overlay-content">
             <p>{{ texts.intro[language] }}</p>
             <p>{{ texts.followup[language]  }}</p>
+            <table>
+                <tr>
+                    <th>{{ getTranslation('total distance') }}</th>
+                    <td>{{ totalDistance + texts.km[language]}}</td>
+                </tr>
+                <tr>
+                    <th>{{ getTranslation('done distance') }}</th>
+                    <td>{{ doneDistance + texts.km[language] + texts.percent[language].replace('VALUE', getPercentDone()) }}</td>
+                </tr>
+            </table>
             <ol id="ridelist" :class="`ridelist-${language}`">
                 <li v-for="item in items" :key="item.filename" :class="completedClass(item)">
                     <a
                         v-on:click="openMap(item.filename, true)"
                         v-on:mousemove="openMap(item.filename, false)"
-                        v-on:mouseout="openMap(null, false)">{{ translateTitle(item.title) }}</a>
+                        v-on:mouseout="openMap(null, false)">{{ translateTitle(item.title) }}
+                    </a>{{ texts.km_bracket[language].replace('VALUE', item.distance) }}
                 </li>
             </ol>
         </div>
@@ -44,6 +55,8 @@
                 contentOpen: false,
                 langOpen: false,
                 items: [],
+                totalDistance: 0,
+                doneDistance: 0,
                 toggleContentButtonHint: 'open details',
                 toggleContentButtonLabel: 'open details',
                 toggleLangButtonHint: 'choose language',
@@ -67,7 +80,7 @@
                 texts: {
                     intro: {
                         'ja': '2020、私はエアロバイク、Oculus Go、VZFit Explorerを購入して、Covidのためにブロックされた今年の意図された日本旅行を事実上実行しました。',
-                        'en': '2020 I have bought a stationary bike, an Oculus Go and VZFit Explorer to virtually go on the intended Japan trip of this year that was blocked due to Covid.',
+                        'en': '2020 I have bought a stationary bike, an Oculus Go and VZFit Explorer to virtually go on my intended trip to Japan that was blocked by Covid.',
                         'de': '2020 habe ich ein stationäres Fahrrad, ein Oculus Go und einen VZFit Explorer gekauft, um die geplante aber aufgrund von Covid blockierte Reise nach Japan virtuell durchzuführen.',
                         'de-ch': '2020 hani mer es stationärs Velo, es Oculus Go u VZFit Explorer poschtet, für die planti aber wäge Covid verschobeni Reis nach Japan virtueu dürezfüehre.'
                     },
@@ -76,7 +89,24 @@
                         'en': 'This map shows the route and my current progress.',
                         'de': 'Diese Karte zeigt die Route und meinen aktuellen Fortschritt.',
                         'de-ch': 'Uf dere Charte gseht me d\'Route u woni grad stecke.'
-
+                    },
+                    km: {
+                        'ja': 'キロ',
+                        'en': ' km',
+                        'de': ' km',
+                        'de-ch': ' km'
+                    },
+                    km_bracket: {
+                        'ja': '（VALUEキロ）',
+                        'en': ' (VALUE km)',
+                        'de': ' (VALUE km)',
+                        'de-ch': ' (VALUE km)'
+                    },
+                    percent: {
+                        'ja': '（VALUE％）',
+                        'en': ' (VALUE %)',
+                        'de': ' (VALUE %)',
+                        'de-ch': ' (VALUE %)'
                     }
                 }
             };
@@ -87,6 +117,8 @@
             }).then(data => {
                 this.translations = data.translations;
                 this.items = data.rides;
+                this.totalDistance = this.getTotalDistance();
+                this.doneDistance = this.getDoneDistance();
                 this.toggleContentButtonHint = this.getTranslation(this.contentOpen ? 'close' : 'open details');
                 this.toggleContentButtonLabel = this.getTranslation(this.contentOpen ? 'X' : 'open details');
                 this.toggleLangButtonHint = this.getTranslation(this.langOpen ? 'close' : 'choose language');
@@ -146,6 +178,19 @@
                   return this.translations.filter(elem => elem.key === key)[0][this.language];
                 }
                 return '...';
+            },
+            getTotalDistance () {
+                let distance = 0;
+                this.items?.forEach(item => distance += parseInt(item.distance, 10));
+                return distance;
+            },
+            getDoneDistance () {
+                let distance = 0;
+                this.items?.forEach(item => distance += ((item.distance * item.completed) / 100));
+                return Math.round(distance);
+            },
+            getPercentDone () {
+                return Math.round((this.doneDistance * 100) / this.totalDistance);
             },
             completedClass (ride) {
                 const completed = parseFloat(ride.completed);
