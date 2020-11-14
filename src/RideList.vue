@@ -15,7 +15,7 @@
         <fieldset class="toggle-overlay">
             <input type="checkbox" name="toggleOverlay" id="overlayVisible" v-model="overlayVisible" />
             <label for="overlayVisible">{{ getTranslation('show towns') }}</label>
-            <a v-on:click="resetMap()">
+            <a v-on:click="resetMap()" :title="getTranslation('reset map')">
                 {{ getTranslation('reset map') }}
             </a>
         </fieldset>
@@ -26,7 +26,7 @@
                 <tr>
                     <th>{{ getTranslation('current location') }}</th>
                     <td>
-                        <a v-on:click="openCurrentMarker()">
+                        <a v-on:click="openCurrentMarker()" :title="getTranslation('show on map')">
                             {{ locationName }}
                         </a>
                     </td>
@@ -42,7 +42,7 @@
             </table>
             <ol id="ridelist" :class="`ridelist-${language}`">
                 <li v-for="item in items" :key="item.filename" :class="completedClass(item)">
-                    <a
+                    <a :title="getTranslation('show on map')"
                         v-on:click="openMap(item.filename, true)"
                         v-on:mouseenter="openMap(item.filename, false)"
                     >
@@ -155,7 +155,7 @@
             addLinks: function (text) {
                 Object.keys(this.links).forEach(key => text = text.replace(
                     key,
-                    `<a href="${this.links[key]}" target="_blank">${key}</a>`
+                    `<a href="${this.links[key]}" target="_blank" title="${this.getTranslation('new window')}">${key}</a>`
                 ));
                 return text;
             },
