@@ -24,7 +24,7 @@
         viewWidth: window.innerWidth,
         doZoom: true,
         location: undefined,
-        languageCode: this.getDefaultLanguage()
+        languageCode: undefined
       }
     },
     methods: {
@@ -50,16 +50,6 @@
       },
       changeLanguage(language) {
         this.languageCode = language;
-      },
-      getDefaultLanguage() {
-          let lang = window.navigator.language.toLowerCase();
-          const langs = ['ja', 'en', 'de', 'de-ch'];
-          if (langs.indexOf(lang) > -1) {
-              return lang;
-          } else if (langs.indexOf(lang.split('-')[0]) > -1) {
-              return lang.split('-')[0];
-          }
-          return 'en';
       }
     },
     mounted() {
@@ -253,6 +243,11 @@
 
   .toggle-overlay {
     border: 0;
+  }
+
+  .toggle-overlay label {
+    white-space: nowrap;
+    display: inline-block;
   }
 
   .toggle-overlay a {

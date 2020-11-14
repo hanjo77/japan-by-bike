@@ -132,6 +132,7 @@
                 this.translations = data.translations;
                 this.items = data.rides;
                 this.getCurrentCoords();
+                this.changeLanguage(this.language);
                 this.totalDistance = this.getTotalDistance();
                 this.doneDistance = this.getDoneDistance();
                 this.toggleContentButtonHint = this.getTranslation(this.contentOpen ? 'close' : 'open details');
@@ -261,15 +262,17 @@
                 });
             },
             getLocationName () {
-                fetch('https://nominatim.openstreetmap.org/reverse?format=json'
-                    + '&accept-language=' + this.language.split('-')[0]
-                    + '&lon=' + this.currentCoords[0]
-                    + '&lat=' + this.currentCoords[1]
-                )
-                    .then((response) => response.json())
-                    .then(function(json) {
-                        this.locationName = json.display_name;
-                    }.bind(this));
+                if (this.language && this.currentCoords.length === 2) {
+                    fetch('https://nominatim.openstreetmap.org/reverse?format=json'
+                        + '&accept-language=' + this.language.split('-')[0]
+                        + '&lon=' + this.currentCoords[0]
+                        + '&lat=' + this.currentCoords[1]
+                    )
+                        .then((response) => response.json())
+                        .then(function(json) {
+                            this.locationName = json.display_name;
+                        }.bind(this));
+                }
             },
             completedClass (ride) {
                 const completed = parseFloat(ride.completed);
