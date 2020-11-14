@@ -61,7 +61,7 @@ except OSError:
 
 def upload(ftp, file):
     ext = os.path.splitext(clientpath + file)[1]
-    if ext in (".txt", ".json", ".htm", ".html"):
+    if ext in (".txt", ".htm", ".html"):
         ftp.storlines("STOR " + serverpath + file, open(clientpath + file))
     else:
         ftp.storbinary("STOR " + serverpath + file, open(clientpath + file, "rb"), 1024)
