@@ -95,7 +95,7 @@
                     intro: {
                         'ja': '2020、私はエアロバイク、Oculus Quest、VZFit Explorerを購入して、COVIDのためにブロックされた今年の意図された日本旅行を事実上実行しました。',
                         'en': 'In 2020, I have bought a stationary bike, an Oculus Quest and VZFit Explorer to virtually go on my intended trip to Japan that was blocked by COVID.',
-                        'de': '2020 habe ich ein stationäres Fahrrad, ein Oculus Quest und einen VZFit Explorer gekauft, um die geplante aber aufgrund von COVID blockierte Reise nach Japan virtuell durchzuführen.',
+                        'de': '2020 habe ich ein stationäres Fahrrad, ein Oculus Quest und VZFit Explorer gekauft, um die geplante aber aufgrund von COVID blockierte Reise nach Japan virtuell durchzuführen.',
                         'de-ch': 'Im 2020 hani mer es stationärs Velo, es Oculus Quest u VZFit Explorer poschtet, für die planti aber wäge COVID verschobeni Reis nach Japan virtueu dürezfüehre.'
                     },
                     followup: {
@@ -243,34 +243,44 @@
                 return Math.round((this.doneDistance * 100) / this.totalDistance);
             },
             getCurrentCoords () {
+                let lastCompleted = undefined;
                 this.items.forEach(item => {
                     const completed = parseInt(item.completed, 10);
-                    if (0 < completed < 100) {
-                        fetch('data/' + item.filename)
-                            .then(response => response.text())
-                            .then(kmlData => {
-                                const coordData = new DOMParser()
-                                    .parseFromString(kmlData, "text/xml")
-                                    .querySelector('coordinates')?.innerHTML
-                                    .split(new RegExp('[,\\s]', 'g'))
-                                    .filter(elem => !!elem)
-                                    .map(elem => parseFloat(elem));
+                    if (completed > 0) {
+                        lastCompleted = item;
+                    }
+                });
+                if (lastCompleted) {
+                    const completed = parseInt(lastCompleted.completed, 10);
+                    fetch('data/' + lastCompleted.filename)
+                        .then(response => response.text())
+                        .then(kmlData => {
+                            const coordData = new DOMParser()
+                                .parseFromString(kmlData, "text/xml")
+                                .querySelector('coordinates')?.innerHTML
+                                .split(new RegExp('[,\\s]', 'g'))
+                                .filter(elem => !!elem)
+                                .map(elem => parseFloat(elem));
 
-                                const coords = [];
+                            const coords = [];
 
-                                for (let i = 0; i < coordData?.length; i += 3) {
-                                    coords.push([coordData[i], coordData[i + 1]]);
-                                }
+                            for (let i = 0; i < coordData?.length; i += 3) {
+                                coords.push([coordData[i], coordData[i + 1]]);
+                            }
 
+                            if (completed < 100) {
                                 const completedIndex = Math.floor(completed * coords.length / 100);
                                 
                                 if (coords[completedIndex]) {
                                     this.currentCoords = coords[completedIndex];
                                     this.getLocationName();
                                 }
-                            });
-                    }
-                });
+                            } else {
+                                this.currentCoords = coords[coords.length - 1];
+                                this.getLocationName();
+                            }
+                        });
+                }
             },
             getLocationName () {
                 if (this.language && this.currentCoords.length === 2) {
